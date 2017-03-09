@@ -1,0 +1,21 @@
+{
+  "name": "planeta_leta",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Arthur",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.18.2",
+    "gulp": "^3.9.1",
+    "gulp-if": "^2.0.2",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-rimraf": "^0.2.1",
+    "gulp-size": "^2.1.0",
+    "gulp-uglify": "^2.0.0",
+    "gulp-useref": "^3.1.2"
+  }
+}
