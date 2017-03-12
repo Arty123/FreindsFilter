@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>FriendsFilter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:400,600,700" rel="stylesheet">
+    <script src="https://vk.com/js/api/openapi.js?139"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="./img/logo.png" class="logo__img" alt="">
+        </div>
+        <div class="filter">
+            <div class="filter__header">
+                <div class="filter__title">Выберите друзей
+                    <a href="#">
+                        <img src="./img/header__close.png" class="header__close-img" alt="">
+                    </a>
+                </div>
+            </div>
+            <div class="filter__search clearfix">
+                <input id="searchSourceInput" class="search__input search__input_left" type="text" name="" value="" placeholder="Начните вводить имя друга">
+                <input id="searchTargetInput" class="search__input search__input_right" type="text" name="" value="" placeholder="Название">
+            </div>
+            <div id="filterContainer" class="filter__body parent-inline">
+                <div class="filter__body_left child-inline">
+                    <div class="list__title">Ваши друзья</div>
+                    <ul class="list" id="defaultList">
+                    </ul>
+                </div>
+                <div class="filter__body_right child-inline">
+                    <div class="list__title">Друзья в списке</div>
+                    <ul class="list" id="targetList">
+                    </ul>
+                </div>
+            </div>
+            <div class="filter__footer clearfix">
+                <a class="save__btn" href="#">Сохранить</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
