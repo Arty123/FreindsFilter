@@ -3,9 +3,16 @@
 <head>
     <meta charset="utf-8">
     <title>FriendsFilter</title>
+    <link rel="shortcut icon" href="./img/search__icon.png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Fira+Sans:400,600,700" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <script src="https://vk.com/js/api/openapi.js?139"></script>
+    <style media="screen">
+        .search__input {
+            background: #ffffff url('./img/search__icon.png') no-repeat scroll 5px 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -22,7 +29,7 @@
             </div>
             <div class="filter__search clearfix">
                 <input id="searchSourceInput" class="search__input search__input_left" type="text" name="" value="" placeholder="Начните вводить имя друга">
-                <input id="searchTargetInput" class="search__input search__input_right" type="text" name="" value="" placeholder="Название">
+                <input id="searchTargetInput" class="search__input search__input_right" type="text" name="" value="" placeholder="Начните вводить имя друга">
             </div>
             <div id="filterContainer" class="filter__body parent-inline">
                 <div class="filter__body_left child-inline">

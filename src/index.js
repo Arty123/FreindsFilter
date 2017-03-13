@@ -153,7 +153,8 @@ function createFriendsTargetListDiv(friends) {
     });
 }
 
-function saveList() {
+function saveList(e) {
+    e.preventDefault();
     var serialSrcArr = JSON.stringify(sourceArray),
         serialTargetArr = JSON.stringify(targetArray);
 

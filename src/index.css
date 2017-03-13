@@ -95,9 +95,17 @@ ul {
     padding: 0px 7px;
 }
 
+.search__icon::before {
+    font-family: "Font Awesome";
+    display: inline;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    content: "\f002";
+    top: 0px;
+}
+
 .search__input_left {
-    background: #ffffff;
-    /*background: #ffffff url("../img/search__icon.png") no-repeat scroll 5px 5px;*/
     margin-right: 20px;
     padding-left: 24px;
     width: 254px;
@@ -105,6 +113,8 @@ ul {
 
 .search__input_right {
     float: right;
+    padding-left: 24px;
+    width: 254px;
 }
 
 .search__input::-webkit-input-placeholder {color:#aeaeae; font-size: 12px;}
