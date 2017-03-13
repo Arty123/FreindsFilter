@@ -1,7 +1,9 @@
 require('./index.css');
 
 var filterContainer = document.getElementById('filterContainer'),
-    dragSrcEl = null, dragId = 0, sourceArray = [], targetArray = [], searchSrcArray = [], searchTargetArray = [],
+    dragSrcEl = null, dragId = 0,
+    sourceArray = [], targetArray = [],
+    searchSrcArray = [], searchTargetArray = [],
     targetList = document.getElementById('targetList'),
     defaultList = document.getElementById('defaultList'),
     searchSourceInput = document.getElementById('searchSourceInput'),
@@ -151,6 +153,14 @@ function createFriendsTargetListDiv(friends) {
     });
 }
 
+function saveList() {
+    var serialSrcArr = JSON.stringify(sourceArray),
+        serialTargetArr = JSON.stringify(targetArray);
+
+    localStorage.setItem("serialSrcArr", serialSrcArr);
+    localStorage.setItem("serialTargetArr", serialTargetArr);
+}
+
 targetList.addEventListener('drop', drop);
 targetList.addEventListener('dragover', allowDrop);
 
@@ -198,7 +208,6 @@ searchTargetInput.addEventListener('keyup', function() {
     searchTargetArray = [];
 
     if (searchTargetInput.value) {
-        console.log(searchTargetInput.value);
         for (var item of targetArray) {
             if (isMatching(item.first_name, searchTargetInput.value) || isMatching(item.last_name, searchTargetInput.value)) {
                 searchTargetArray.push(item);
@@ -214,10 +223,22 @@ searchTargetInput.addEventListener('keyup', function() {
     }
 })
 
+saveBtn.addEventListener('click', saveList)
+
 login()
     .then(() => callAPI('friends.get', { v: 5.62, fields: ['city', 'country', 'photo_100'] }))
     .then(result => {
-            defaultList.innerHTML = createFriendsDiv(result.items);
-            sourceArray = result.items;
+            if (localStorage['serialTargetArr']) {
+                targetArray = JSON.parse(localStorage.getItem(['serialTargetArr']));
+                targetList.innerHTML = createFriendsTargetListDiv(targetArray);
+            }
+
+            if (localStorage['serialSrcArr']) {
+                sourceArray = JSON.parse(localStorage.getItem(['serialSrcArr']));
+                defaultList.innerHTML = createFriendsDiv(sourceArray);
+            } else {
+                sourceArray = result.items;
+                defaultList.innerHTML = createFriendsDiv(sourceArray);
+            }
         })
     .catch(() => alert('всё плохо'));
