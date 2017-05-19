@@ -1,5 +1,9 @@
 require('./index.css');
 
+import {loginClass} from './login.js';
+
+
+
 var filterContainer = document.getElementById('filterContainer'),
     dragSrcEl = null, dragId = 0,
     sourceArray = [], targetArray = [],
@@ -8,6 +12,38 @@ var filterContainer = document.getElementById('filterContainer'),
     defaultList = document.getElementById('defaultList'),
     searchSourceInput = document.getElementById('searchSourceInput'),
     searchTargetInput = document.getElementById('searchTargetInput');
+
+function dataClass(){
+    this.targetArray = [];
+
+    this.targetList = document.getElementById('targetList');
+
+    this.defaultList = document.getElementById('defaultList');
+
+    this.sourceArray = [];
+};
+
+dataClass.prototype.createFriendsTargetListDiv = function (friends) {
+    var templateFn = require('../friend-target-template.hbs');
+
+    friends.sort((a, b) => {
+        var nameA=a.first_name.toLowerCase(), nameB=b.first_name.toLowerCase()
+        if (nameA < nameB)
+            return -1;
+        if (nameA > nameB)
+            return 1;
+
+        return 0;
+    });
+
+    return templateFn({
+        friends: friends
+    });
+};
+
+var login = new loginClass(),
+    dataClass = new dataClass();
+
 
 function allowDrop(ev) {
     ev.preventDefault();
@@ -82,32 +118,32 @@ function addElemInTargetList(e) {
     }
 }
 
-function login() {
-    return new Promise((resolve, reject) => {
-        VK.init({
-            apiId: 5919739
-        });
-        VK.Auth.login(function(result) {
-            if (result.status == 'connected') {
-                resolve();
-            } else {
-                reject();
-            }
-        });
-    });
-}
-
-function callAPI(method, params) {
-    return new Promise((resolve, reject) => {
-        VK.api(method, params, function(result) {
-            if (result.error) {
-                reject();
-            } else {
-                resolve(result.response);
-            }
-        });
-    });
-}
+//function login() {
+//    return new Promise((resolve, reject) => {
+//        VK.init({
+//            apiId: 5919739
+//        });
+//        VK.Auth.login(function(result) {
+//            if (result.status == 'connected') {
+//                resolve();
+//            } else {
+//                reject();
+//            }
+//        });
+//    });
+//}
+//
+//function callAPI(method, params) {
+//    return new Promise((resolve, reject) => {
+//        VK.api(method, params, function(result) {
+//            if (result.error) {
+//                reject();
+//            } else {
+//                resolve(result.response);
+//            }
+//        });
+//    });
+//}
 
 function createFriendsDiv(friends) {
     var templateFn = require('../friend-template.hbs');
@@ -226,20 +262,25 @@ searchTargetInput.addEventListener('keyup', function() {
 
 saveBtn.addEventListener('click', saveList)
 
-login()
-    .then(() => callAPI('friends.get', { v: 5.62, fields: ['city', 'country', 'photo_100'] }))
-    .then(result => {
-            if (localStorage['serialTargetArr']) {
-                targetArray = JSON.parse(localStorage.getItem(['serialTargetArr']));
-                targetList.innerHTML = createFriendsTargetListDiv(targetArray);
-            }
+//login()
+//    .then(() => callAPI('friends.get', { v: 5.62, fields: ['city', 'country', 'photo_100'] }))
+//    .then(result => {
+//            if (localStorage['serialTargetArr']) {
+//                targetArray = JSON.parse(localStorage.getItem(['serialTargetArr']));
+//                targetList.innerHTML = createFriendsTargetListDiv(targetArray);
+//            }
+//
+//            if (localStorage['serialSrcArr']) {
+//                sourceArray = JSON.parse(localStorage.getItem(['serialSrcArr']));
+//                defaultList.innerHTML = createFriendsDiv(sourceArray);
+//            } else {
+//                sourceArray = result.items;
+//                defaultList.innerHTML = createFriendsDiv(sourceArray);
+//            }
+//        })
+//    .catch(() => alert('всё плохо'));
 
-            if (localStorage['serialSrcArr']) {
-                sourceArray = JSON.parse(localStorage.getItem(['serialSrcArr']));
-                defaultList.innerHTML = createFriendsDiv(sourceArray);
-            } else {
-                sourceArray = result.items;
-                defaultList.innerHTML = createFriendsDiv(sourceArray);
-            }
-        })
-    .catch(() => alert('всё плохо'));
+
+
+
+login.instance(dataClass);
