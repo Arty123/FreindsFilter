@@ -33,20 +33,21 @@ loginClass.prototype.login = function () {
 };
 
 loginClass.prototype.instance = function(dataClass) {
+    console.log(dataClass);
     this.login()
         .then(() => this.callAPI('friends.get', { v: 5.62, fields: ['city', 'country', 'photo_100'] }))
         .then(result => {
             if (localStorage['serialTargetArr']) {
                 dataClass.targetArray = JSON.parse(localStorage.getItem(['serialTargetArr']));
-                dataClass.targetList.innerHTML = dataClass.createFriendsTargetListDiv(targetArray);
+                dataClass.targetList.innerHTML = dataClass.createFriendsTargetListDiv(dataClass.targetArray);
             }
 
             if (localStorage['serialSrcArr']) {
-                sourceArray = JSON.parse(localStorage.getItem(['serialSrcArr']));
-                defaultList.innerHTML = createFriendsDiv(sourceArray);
+                dataClass.sourceArray = JSON.parse(localStorage.getItem(['serialSrcArr']));
+                dataClass.defaultList.innerHTML = dataClass.createFriendsDiv(dataClass.sourceArray);
             } else {
-                sourceArray = result.items;
-                defaultList.innerHTML = createFriendsDiv(sourceArray);
+                dataClass.sourceArray = result.items;
+                dataClass.defaultList.innerHTML = dataClass.createFriendsDiv(dataClass.sourceArray);
             }
         })
         .catch((e) => alert(e));

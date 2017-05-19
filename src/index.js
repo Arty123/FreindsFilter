@@ -41,8 +41,26 @@ dataClass.prototype.createFriendsTargetListDiv = function (friends) {
     });
 };
 
+dataClass.prototype.createFriendsDiv = function(friends) {
+    var templateFn = require('../friend-template.hbs');
+
+    friends.sort((a, b) => {
+        var nameA = a.first_name.toLowerCase(), nameB = b.first_name.toLowerCase()
+        if (nameA < nameB)
+            return -1;
+        if (nameA > nameB)
+            return 1;
+
+        return 0;
+    });
+
+    return templateFn({
+        friends: friends
+    });
+};
+
 var login = new loginClass(),
-    dataClass = new dataClass();
+    data = new dataClass();
 
 
 function allowDrop(ev) {
@@ -283,4 +301,4 @@ saveBtn.addEventListener('click', saveList)
 
 
 
-login.instance(dataClass);
+login.instance(data);
