@@ -16,11 +16,11 @@ var bootstrapClass = (function () {
         object.filterContainer = document.getElementById('filterContainer');
         object.dragSrcEl = null;
         object.dragId = 0;
-        object.dragId = 0;
         object.searchSrcArray = [];
         object.searchTargetArray = [];
         object.searchSourceInput = document.getElementById('searchSourceInput');
         object.searchTargetInput = document.getElementById('searchTargetInput');
+
 
         return object;
     }
