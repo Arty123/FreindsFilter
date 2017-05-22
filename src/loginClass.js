@@ -32,22 +32,21 @@ loginClass.prototype.login = function () {
     });
 };
 
-loginClass.prototype.instance = function(dataClass) {
-    console.log(dataClass);
+loginClass.prototype.instance = function(bootstrap, dataClass) {
     this.login()
         .then(() => this.callAPI('friends.get', { v: 5.62, fields: ['city', 'country', 'photo_100'] }))
         .then(result => {
             if (localStorage['serialTargetArr']) {
-                dataClass.targetArray = JSON.parse(localStorage.getItem(['serialTargetArr']));
-                dataClass.targetList.innerHTML = dataClass.createFriendsTargetListDiv(dataClass.targetArray);
+                bootstrap.targetArray = JSON.parse(localStorage.getItem(['serialTargetArr']));
+                bootstrap.targetList.innerHTML = dataClass.createFriendsTargetListDiv(bootstrap.targetArray);
             }
 
             if (localStorage['serialSrcArr']) {
-                dataClass.sourceArray = JSON.parse(localStorage.getItem(['serialSrcArr']));
-                dataClass.defaultList.innerHTML = dataClass.createFriendsDiv(dataClass.sourceArray);
+                bootstrap.sourceArray = JSON.parse(localStorage.getItem(['serialSrcArr']));
+                bootstrap.defaultList.innerHTML = dataClass.createFriendsDiv(bootstrap.sourceArray);
             } else {
-                dataClass.sourceArray = result.items;
-                dataClass.defaultList.innerHTML = dataClass.createFriendsDiv(dataClass.sourceArray);
+                bootstrap.sourceArray = result.items;
+                bootstrap.defaultList.innerHTML = dataClass.createFriendsDiv(bootstrap.sourceArray);
             }
         })
         .catch((e) => alert(e));

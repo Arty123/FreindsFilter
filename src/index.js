@@ -1,67 +1,12 @@
 require('./index.css');
 
-import {loginClass} from './login.js';
-
-
-
-var filterContainer = document.getElementById('filterContainer'),
-    dragSrcEl = null, dragId = 0,
-    sourceArray = [], targetArray = [],
-    searchSrcArray = [], searchTargetArray = [],
-    targetList = document.getElementById('targetList'),
-    defaultList = document.getElementById('defaultList'),
-    searchSourceInput = document.getElementById('searchSourceInput'),
-    searchTargetInput = document.getElementById('searchTargetInput');
-
-function dataClass(){
-    this.targetArray = [];
-
-    this.targetList = document.getElementById('targetList');
-
-    this.defaultList = document.getElementById('defaultList');
-
-    this.sourceArray = [];
-};
-
-dataClass.prototype.createFriendsTargetListDiv = function (friends) {
-    var templateFn = require('../friend-target-template.hbs');
-
-    friends.sort((a, b) => {
-        var nameA=a.first_name.toLowerCase(), nameB=b.first_name.toLowerCase()
-        if (nameA < nameB)
-            return -1;
-        if (nameA > nameB)
-            return 1;
-
-        return 0;
-    });
-
-    return templateFn({
-        friends: friends
-    });
-};
-
-dataClass.prototype.createFriendsDiv = function(friends) {
-    var templateFn = require('../friend-template.hbs');
-
-    friends.sort((a, b) => {
-        var nameA = a.first_name.toLowerCase(), nameB = b.first_name.toLowerCase()
-        if (nameA < nameB)
-            return -1;
-        if (nameA > nameB)
-            return 1;
-
-        return 0;
-    });
-
-    return templateFn({
-        friends: friends
-    });
-};
+import {loginClass} from './loginClass.js';
+import {dataClass} from './dataClass.js';
+import {bootstrapClass} from './bootstrapClass.js';
 
 var login = new loginClass(),
-    data = new dataClass();
-
+    data = new dataClass(),
+    bootstrap = bootstrapClass.getInstance();
 
 function allowDrop(ev) {
     ev.preventDefault();
@@ -97,123 +42,6 @@ function drop(e) {
 
     // if not dragSrcEl
     return false;
-}
-
-function findAndRefreshElements(source, dest, id) {
-    for (var i = 0; i < source.length; i++) {
-        if (source[i].id == id) {
-            dest.push(source[i]);
-            source.splice(i, 1);
-
-            return;
-        }
-    }
-}
-
-function deleteAddedElem(e) {
-    var elemId;
-    e.preventDefault();
-
-    if (e.target.parentNode.hasAttribute('data-delete')) {
-        elemId = e.target.closest('li').getAttribute('id');
-        findAndRefreshElements(targetArray, sourceArray, elemId);
-
-        targetList.innerHTML = createFriendsTargetListDiv(targetArray);
-        defaultList.innerHTML = createFriendsDiv(sourceArray);
-    }
-}
-
-function addElemInTargetList(e) {
-    var elemId;
-    e.preventDefault();
-
-    if (e.target.parentNode.hasAttribute('data-add')) {
-        elemId = e.target.closest('li').getAttribute('id');
-        findAndRefreshElements(sourceArray, targetArray, elemId);
-
-        targetList.innerHTML = createFriendsTargetListDiv(targetArray);
-        defaultList.innerHTML = createFriendsDiv(sourceArray);
-    }
-}
-
-//function login() {
-//    return new Promise((resolve, reject) => {
-//        VK.init({
-//            apiId: 5919739
-//        });
-//        VK.Auth.login(function(result) {
-//            if (result.status == 'connected') {
-//                resolve();
-//            } else {
-//                reject();
-//            }
-//        });
-//    });
-//}
-//
-//function callAPI(method, params) {
-//    return new Promise((resolve, reject) => {
-//        VK.api(method, params, function(result) {
-//            if (result.error) {
-//                reject();
-//            } else {
-//                resolve(result.response);
-//            }
-//        });
-//    });
-//}
-
-function createFriendsDiv(friends) {
-    var templateFn = require('../friend-template.hbs');
-
-    friends.sort((a, b) => {
-        var nameA=a.first_name.toLowerCase(), nameB=b.first_name.toLowerCase()
-        if (nameA < nameB)
-            return -1;
-        if (nameA > nameB)
-            return 1;
-
-        return 0;
-      });
-
-    return templateFn({
-        friends: friends
-    });
-}
-
-function isMatching(full, chunk) {
-    if (full.toLowerCase().indexOf(chunk.toLowerCase()) != -1) {
-        return true;
-    }
-
-    return false;
-}
-
-function createFriendsTargetListDiv(friends) {
-    var templateFn = require('../friend-target-template.hbs');
-
-    friends.sort((a, b) => {
-        var nameA=a.first_name.toLowerCase(), nameB=b.first_name.toLowerCase()
-        if (nameA < nameB)
-            return -1;
-        if (nameA > nameB)
-            return 1;
-
-        return 0;
-      });
-
-    return templateFn({
-        friends: friends
-    });
-}
-
-function saveList(e) {
-    e.preventDefault();
-    var serialSrcArr = JSON.stringify(sourceArray),
-        serialTargetArr = JSON.stringify(targetArray);
-
-    localStorage.setItem("serialSrcArr", serialSrcArr);
-    localStorage.setItem("serialTargetArr", serialTargetArr);
 }
 
 targetList.addEventListener('drop', drop);
@@ -301,4 +129,4 @@ saveBtn.addEventListener('click', saveList)
 
 
 
-login.instance(data);
+login.instance(bootstrap, data);
