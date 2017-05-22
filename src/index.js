@@ -44,6 +44,96 @@ function drop(e) {
     return false;
 }
 
+function findAndRefreshElements(source, dest, id) {
+    for (var i = 0; i < source.length; i++) {
+        if (source[i].id == id) {
+            dest.push(source[i]);
+            source.splice(i, 1);
+
+            return;
+        }
+    }
+}
+
+function deleteAddedElem(e) {
+    var elemId;
+    e.preventDefault();
+
+    if (e.target.parentNode.hasAttribute('data-delete')) {
+        elemId = e.target.closest('li').getAttribute('id');
+        findAndRefreshElements(targetArray, sourceArray, elemId);
+
+        targetList.innerHTML = createFriendsTargetListDiv(targetArray);
+        defaultList.innerHTML = createFriendsDiv(sourceArray);
+    }
+}
+
+function addElemInTargetList(e) {
+    var elemId;
+    e.preventDefault();
+
+    if (e.target.parentNode.hasAttribute('data-add')) {
+        elemId = e.target.closest('li').getAttribute('id');
+        findAndRefreshElements(sourceArray, targetArray, elemId);
+
+        targetList.innerHTML = createFriendsTargetListDiv(targetArray);
+        defaultList.innerHTML = createFriendsDiv(sourceArray);
+    }
+}
+
+function createFriendsDiv(friends) {
+    var templateFn = require('../friend-template.hbs');
+
+    friends.sort((a, b) => {
+        var nameA=a.first_name.toLowerCase(), nameB=b.first_name.toLowerCase()
+        if (nameA < nameB)
+            return -1;
+        if (nameA > nameB)
+            return 1;
+
+        return 0;
+      });
+
+    return templateFn({
+        friends: friends
+    });
+}
+
+function isMatching(full, chunk) {
+    if (full.toLowerCase().indexOf(chunk.toLowerCase()) != -1) {
+        return true;
+    }
+
+    return false;
+}
+
+function createFriendsTargetListDiv(friends) {
+    var templateFn = require('../friend-target-template.hbs');
+
+    friends.sort((a, b) => {
+        var nameA=a.first_name.toLowerCase(), nameB=b.first_name.toLowerCase()
+        if (nameA < nameB)
+            return -1;
+        if (nameA > nameB)
+            return 1;
+
+        return 0;
+      });
+
+    return templateFn({
+        friends: friends
+    });
+}
+
+function saveList(e) {
+    e.preventDefault();
+    var serialSrcArr = JSON.stringify(sourceArray),
+        serialTargetArr = JSON.stringify(targetArray);
+
+    localStorage.setItem("serialSrcArr", serialSrcArr);
+    localStorage.setItem("serialTargetArr", serialTargetArr);
+}
+
 targetList.addEventListener('drop', drop);
 targetList.addEventListener('dragover', allowDrop);
 
