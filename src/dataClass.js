@@ -1,14 +1,59 @@
 /**
  * Created by art on 22.05.17.
  */
-import {bootstrapClass} from './bootstrapClass.js';
 
-export function dataClass(bootstrap){
-    var saveBtn = document.getElementById('saveBtn');
-    saveBtn.addEventListener('click', this.saveList)
+export function dataClass(bootstrapClass){
+    var bootstrap = bootstrapClass.getInstance(),
+        saveBtn = document.getElementById('saveBtn');
 
-    bootstrap.targetList.addEventListener('drop', this.drop);
-    bootstrap.targetList.addEventListener('dragover', this.allowDrop);
+    /**
+     * Save to local storage
+     */
+    saveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        var serialSrcArr = JSON.stringify(bootstrap.sourceArray),
+            serialTargetArr = JSON.stringify(bootstrap.targetArray);
+
+        localStorage.setItem("serialSrcArr", serialSrcArr);
+        localStorage.setItem("serialTargetArr", serialTargetArr);
+    });
+
+
+    /**
+     * Drag'n'Drop callbacks
+     */
+    bootstrap.targetList.addEventListener('dragstart', (e) => {
+        return false;
+    });
+
+    bootstrap.targetList.addEventListener('dragover', (e) => e.preventDefault());
+
+    bootstrap.targetList.addEventListener('drop', (e) => {
+        var str = '',
+            addedElem;
+
+        if (e.stopPropagation) {
+            // Stops some browsers from redirecting.
+            e.stopPropagation();
+        }
+
+        this.findAndRefreshElements(bootstrap.sourceArray, bootstrap.targetArray, bootstrap.dragId);
+        // if dragSrcEl's context not from a defaultList
+        if (bootstrap.dragSrcEl != this && bootstrap.dragSrcEl != null) {
+
+            bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.targetArray);
+            bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.sourceArray);
+            // clean added dragSrcEl's context
+            bootstrap.dragSrcEl = null;
+        }
+
+        // if not dragSrcEl
+        return false;
+    });
+
+    /**
+     * Use delegation of events, when we take item from source list
+     */
     bootstrap.defaultList.addEventListener('mousedown', (e) => {
         // delegate events for defaultList's children
         // if clicked on <li draggable="true">
@@ -20,32 +65,78 @@ export function dataClass(bootstrap){
         }
 
         if (elem) {
-            elem.addEventListener('dragstart', this.drag, false);
+            elem.addEventListener('dragstart', function (e) {
+                // set dragSrcEl
+                bootstrap.dragSrcEl = this;
+                bootstrap.dragId = this.getAttribute('id');
+
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', this.innerHTML);
+            }, false);
         }
     });
-    bootstrap.defaultList.addEventListener('click', this.addElemInTargetList);
-    bootstrap.targetList.addEventListener('click', this.deleteAddedElem);
-    bootstrap.targetList.addEventListener('dragstart', () => {return false;});
-    bootstrap.searchSourceInput.addEventListener('keyup', function() {
-        searchSrcArray = [];
+
+    /**
+     * Delegation events on plus button in source list
+     */
+    bootstrap.defaultList.addEventListener('click', (e) => {
+        var elemId;
+        e.preventDefault();
+
+        if (e.target.parentNode.hasAttribute('data-add')) {
+            elemId = e.target.closest('li').getAttribute('id');
+
+            this.findAndRefreshElements(bootstrap.sourceArray, bootstrap.targetArray, elemId);
+
+            bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.targetArray);
+            bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.sourceArray);
+        }
+    });
+
+
+    /**
+     * Delegation events on delete button in source list
+     */
+    bootstrap.targetList.addEventListener('click', (e) => {
+        var elemId;
+        e.preventDefault();
+
+        if (e.target.parentNode.hasAttribute('data-delete')) {
+            elemId = e.target.closest('li').getAttribute('id');
+            this.findAndRefreshElements(bootstrap.targetArray, bootstrap.sourceArray, elemId);
+
+            bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.targetArray);
+            bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.sourceArray);
+        }
+    });
+
+    /**
+     * Search input event in source list
+     */
+    bootstrap.searchSourceInput.addEventListener('keyup', (e) => {
+        var searchSrcArray = [];
 
         if (bootstrap.searchSourceInput.value) {
             for (var item of bootstrap.sourceArray) {
                 if (this.isMatching(item.first_name, bootstrap.searchSourceInput.value) || this.isMatching(item.last_name, bootstrap.searchSourceInput.value)) {
-                    bootstrap.searchSrcArray.push(item);
+                    searchSrcArray.push(item);
                 }
             }
 
             if (searchSrcArray) {
-                bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.searchSrcArray);
+                bootstrap.defaultList.innerHTML = this.createFriendsDiv(searchSrcArray);
             }
         }
         else {
             bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.sourceArray);
         }
     });
-    bootstrap.searchTargetInput.addEventListener('keyup', function() {
-        searchTargetArray = [];
+
+    /**
+     * Search input event in target list
+     */
+    bootstrap.searchTargetInput.addEventListener('keyup', (e) => {
+        var searchTargetArray = [];
 
         if (bootstrap.searchTargetInput.value) {
             for (var item of bootstrap.targetArray) {
@@ -55,21 +146,15 @@ export function dataClass(bootstrap){
             }
 
             if (searchTargetArray) {
-                bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.searchTargetArray);
+                bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(searchTargetArray);
             }
         }
         else {
             bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.targetArray);
         }
     })
-
 };
 
-dataClass.prototype.bootstrap = bootstrapClass.getInstance();
-
-dataClass.prototype.allowDrop = function (ev) {
-        ev.preventDefault();
-};
 
 dataClass.prototype.createFriendsTargetListDiv = function (friends) {
     var templateFn = require('../friend-target-template.hbs');
@@ -118,64 +203,6 @@ dataClass.prototype.findAndRefreshElements = function (source, dest, id) {
     }
 };
 
-dataClass.prototype.drag = function (e, bootstrap) {
-    // set dragSrcEl
-    bootstrap.dragSrcEl = this;
-    bootstrap.dragId = this.getAttribute('id');
-
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', this.innerHTML);
-};
-
-dataClass.prototype.drop = function(e, bootstrap) {
-    var str = '',
-        addedElem;
-
-    if (e.stopPropagation) {
-        // Stops some browsers from redirecting.
-        e.stopPropagation();
-    }
-
-    this.findAndRefreshElements(bootstrap.sourceArray, bootstrap.targetArray, bootstrap.dragId);
-    // if dragSrcEl's context not from a defaultList
-    if (bootstrap.dragSrcEl != this && bootstrap.dragSrcEl != null) {
-
-        bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.targetArray);
-        bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.sourceArray);
-        // clean added dragSrcEl's context
-        bootstrap.dragSrcEl = null;
-    }
-
-    // if not dragSrcEl
-    return false;
-};
-
-dataClass.prototype.deleteAddedElem =  function (e, bootstrap) {
-    var elemId;
-    e.preventDefault();
-
-    if (e.target.parentNode.hasAttribute('data-delete')) {
-        bootstrap.elemId = e.target.closest('li').getAttribute('id');
-        this.findAndRefreshElements(bootstrap.targetArray, bootstrap.sourceArray, bootstrap.elemId);
-
-        bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.targetArray);
-        bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.sourceArray);
-    }
-};
-
-dataClass.prototype.addElemInTargetList = function (e) {
-    var elemId;
-    e.preventDefault();
-
-    if (e.target.parentNode.hasAttribute('data-add')) {
-        elemId = e.target.closest('li').getAttribute('id');
-        this.findAndRefreshElements(bootstrap.sourceArray, bootstrap.targetArray, elemId);
-
-        bootstrap.targetList.innerHTML = this.createFriendsTargetListDiv(bootstrap.targetArray);
-        bootstrap.defaultList.innerHTML = this.createFriendsDiv(bootstrap.sourceArray);
-    }
-};
-
 dataClass.prototype.createFriendsDiv = function (friends) {
     var templateFn = require('../friend-template.hbs');
 
@@ -219,12 +246,3 @@ dataClass.prototype.createFriendsTargetListDiv = function (friends) {
         friends: friends
     });
 };
-
-dataClass.prototype.saveList = function (e, bootstrap) {
-    e.preventDefault();
-    var serialSrcArr = JSON.stringify(bootstrap.sourceArray),
-        serialTargetArr = JSON.stringify(bootstrap.targetArray);
-
-    localStorage.setItem("serialSrcArr", serialSrcArr);
-    localStorage.setItem("serialTargetArr", serialTargetArr);
-}

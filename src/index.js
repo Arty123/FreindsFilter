@@ -6,6 +6,6 @@ import {bootstrapClass} from './bootstrapClass.js';
 
 var bootstrap = bootstrapClass.getInstance(),
     login = new loginClass(),
-    data = new dataClass(bootstrap);
-console.log(data);
+    data = new dataClass(bootstrapClass);
+
 login.instance(bootstrap, data);
